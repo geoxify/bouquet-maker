@@ -109,6 +109,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* ---------- Reveal modal ---------- */
 .modal { position: fixed; inset: 0; z-index: 9800; display: grid; place-items: center; padding: 1rem; background: rgba(91, 58, 94, 0); transition: background .5s; }
+.modal[hidden] { display: none; } /* without this, the invisible modal blocks all clicks */
 .modal.open { background: rgba(91, 58, 94, .45); }
 .card {
   width: min(480px, 100%); max-height: 92dvh; overflow: auto; text-align: center; padding: 2rem 1.5rem 1.5rem;
