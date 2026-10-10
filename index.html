@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Bouquet Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="top">
+      <h1>Bouquet Builder</h1>
+      <p>Drag blooms into the wrapper and arrange them your way.</p>
+    </header>
+
+    <!-- CANVAS -->
+    <section class="canvas-col">
+      <div class="stage" id="stage">
+        <!-- Back of the wrapper (flowers sit above this) -->
+        <svg class="wrap wrap-back" viewBox="0 0 400 500" aria-hidden="true">
+          <path d="M25 140 Q200 105 375 140 L232 490 L168 490 Z" fill="#FFD9E6" stroke="#F2A7C3" stroke-width="5" stroke-linejoin="round"/>
+          <path d="M60 150 Q200 125 340 150 L220 470 L180 470 Z" fill="#FFEAF2"/>
+        </svg>
+
+        <!-- Placed flowers are inserted here by script.js -->
+        <div class="items" id="items"></div>
+
+        <!-- Front of the wrapper (stems tuck in behind this) -->
+        <svg class="wrap wrap-front" viewBox="0 0 400 500" aria-hidden="true">
+          <path d="M85 280 Q200 335 315 280 L232 490 Q200 497 168 490 Z" fill="#FBC0D6" stroke="#F2A7C3" stroke-width="5" stroke-linejoin="round"/>
+          <path d="M200 322 L200 494" stroke="#F2A7C3" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+          <g fill="#fff" opacity=".65"><circle cx="150" cy="330" r="5"/><circle cx="250" cy="335" r="5"/><circle cx="178" cy="440" r="4"/><circle cx="224" cy="450" r="4"/><circle cx="130" cy="305" r="4"/><circle cx="272" cy="308" r="4"/></g>
+          <!-- ribbon + bow -->
+          <path d="M124 372 Q200 392 276 372 L270 396 Q200 416 130 396 Z" fill="#CDB9F5"/>
+          <g fill="#B9A0EE" stroke="#A58AE0" stroke-width="2">
+            <ellipse cx="172" cy="398" rx="26" ry="15" transform="rotate(-18 172 398)"/>
+            <ellipse cx="228" cy="398" rx="26" ry="15" transform="rotate(18 228 398)"/>
+            <path d="M196 404 L176 448 L192 442 L200 452Z"/><path d="M204 404 L224 448 L208 442 L200 452Z"/>
+          </g>
+          <circle cx="200" cy="400" r="10" fill="#CDB9F5" stroke="#A58AE0" stroke-width="2"/>
+        </svg>
+      </div>
+
+      <div class="actions">
+        <button id="finish" class="btn-main" type="button">Finish bouquet</button>
+        <button id="clear" class="btn-soft" type="button">Start over</button>
+      </div>
+      <p class="hint" id="hint" aria-live="polite">Drag a bloom out of the wrapper to remove it.</p>
+    </section>
+
+    <!-- INVENTORY (tiles are built from the ITEMS list in script.js) -->
+    <aside class="shelf">
+      <h2>Pick your blooms</h2>
+      <div class="grid" id="inventory"></div>
+    </aside>
+  </main>
+
+  <!-- Confetti lands here -->
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+  <!-- THE REVEAL: edit the poem text here -->
+  <div class="modal" id="modal" hidden>
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="poem-title">
+      <h2 id="poem-title">To my baby,</h2>
+      <p class="poem">
+        Like a lotus that blooms in the softest of light,<br />
+        You make all of my days and my evenings so bright.<br />
+        Through all of our moments, the moon and the stars,<br />
+        I'm so lucky to know that your heart is now ours.
+      </p>
+      <p class="sign">Happy Monthsary!</p>
+      <div class="actions">
+        <button id="again" class="btn-soft" type="button">Replay confetti</button>
+        <button id="close" class="btn-main" type="button">Back to bouquet</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
