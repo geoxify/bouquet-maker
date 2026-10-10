@@ -3,7 +3,7 @@
    1. ITEMS      – every flower/charm. Swap the SVGs or labels here.
    2. Inventory  – tiles are generated from ITEMS.
    3. Dragging   – Pointer Events (one code path for mouse + touch).
-   4. Finale     – glow, confetti, then the poem card.
+   4. Finale     – gift box animation, open gift, reveal letter + bouquet, save image.
    ========================================================= */
 
 /* ---------- 1. ITEMS ----------
@@ -204,54 +204,129 @@ function wirePlaced(el) {
 
 $('#clear').addEventListener('click', () => { layer.innerHTML = ''; say('Fresh wrapper. Pick your blooms!'); });
 
-/* ---------- 4. Grand finale ---------- */
-const modal = $('#modal'), confetti = $('#confetti');
-const COLORS = ['#F9A8C9', '#CDB9F5', '#FFE59A', '#BFE8CF', '#FFC1D3', '#FFD3B0'];
-const SHAPES = [
-  c => `<svg viewBox="0 0 24 24"><path d="M12 21 C3 14 2 8 6 5.5 C9 4 11 6 12 8 C13 6 15 4 18 5.5 C22 8 21 14 12 21Z" fill="${c}"/></svg>`,    // heart
-  c => `<svg viewBox="0 0 24 24"><path d="M12 2 C20 8 20 18 12 22 C4 18 4 8 12 2Z" fill="${c}"/></svg>`,                                    // petal
-  c => `<svg viewBox="0 0 24 24"><path d="M12 1 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3Z" fill="${c}"/></svg>`                                 // sparkle
-];
+/* ---------- 4. Gift box → reveal → save image ---------- */
+const shelf = $('#shelf'), canvasActions = $('#canvas-actions'), app = $('#app');
+const giftScene = $('#gift-scene'), giftBox = $('#gift-box'), openGiftBtn = $('#open-gift');
+const revealView = $('#reveal-view'), revealHost = $('#reveal-bouquet'), memoryCapture = $('#memory-capture');
+const GIFT_DROP_MS = 1400;
+const GIFT_CLOSE_MS = 2200;
+let bouquetSnapshot = null;
 
-function burstConfetti() {
-  const r = stageRect(), ox = r.left + r.width / 2, oy = r.top + r.height * .35;
-  for (let i = 0; i < 70; i++) {
-    const p = document.createElement('span');
-    const a = Math.random() * Math.PI * 2, d = 80 + Math.random() * Math.min(window.innerWidth, 520) * .5;
-    p.style.left = ox + 'px';
-    p.style.top = oy + 'px';
-    p.style.setProperty('--dx', Math.cos(a) * d + 'px');
-    p.style.setProperty('--dy', Math.sin(a) * d * .7 - 40 + 'px');
-    p.style.setProperty('--r', rand(720) + 'deg');
-    p.style.animationDelay = Math.random() * .25 + 's';
-    p.innerHTML = SHAPES[i % 3](COLORS[i % COLORS.length]);
-    confetti.append(p);
+function snapshotBouquet() {
+  bouquetSnapshot = stage.cloneNode(true);
+  bouquetSnapshot.removeAttribute('id');
+  bouquetSnapshot.classList.remove('hot', 'glow');
+  bouquetSnapshot.querySelectorAll('.placed').forEach(el => {
+    el.classList.remove('dragging');
+  });
+}
+
+function pinStageForGift() {
+  const r = stage.getBoundingClientRect();
+  stage.classList.add('gift-pinned');
+  stage.style.width = r.width + 'px';
+  stage.style.height = r.height + 'px';
+  stage.style.left = r.left + 'px';
+  stage.style.top = r.top + 'px';
+}
+
+function resetStagePin() {
+  stage.classList.remove('gift-pinned', 'gift-drop', 'gift-hidden');
+  stage.style.width = '';
+  stage.style.height = '';
+  stage.style.left = '';
+  stage.style.top = '';
+}
+
+function startGiftSequence() {
+  shelf.hidden = true;
+  canvasActions.hidden = true;
+  hint.hidden = true;
+  app.classList.add('builder-finished');
+
+  snapshotBouquet();
+  pinStageForGift();
+  giftScene.hidden = false;
+  void giftScene.offsetWidth;
+  giftScene.classList.add('active');
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => stage.classList.add('gift-drop'));
+  });
+
+  setTimeout(() => {
+    stage.classList.add('gift-hidden');
+    giftBox.classList.add('closed');
+  }, GIFT_DROP_MS);
+
+  setTimeout(() => {
+    openGiftBtn.hidden = false;
+    openGiftBtn.focus();
+  }, GIFT_CLOSE_MS);
+}
+
+function cloneBouquetForReveal() {
+  revealHost.innerHTML = '';
+  const clone = (bouquetSnapshot || stage).cloneNode(true);
+  clone.classList.remove('gift-pinned', 'gift-drop', 'gift-hidden', 'hot', 'glow');
+  clone.classList.add('reveal-stage');
+  clone.querySelectorAll('.placed').forEach(el => {
+    el.classList.remove('dragging');
+    el.style.pointerEvents = 'none';
+  });
+  revealHost.append(clone);
+}
+
+function showRevealView() {
+  cloneBouquetForReveal();
+  resetStagePin();
+
+  giftScene.classList.remove('active');
+  giftScene.hidden = true;
+  openGiftBtn.hidden = true;
+  giftBox.classList.remove('closed', 'opening');
+
+  revealView.hidden = false;
+  void revealView.offsetWidth;
+  revealView.classList.add('open');
+  $('#save-memory').focus();
+}
+
+function openGift() {
+  giftBox.classList.add('opening');
+  openGiftBtn.disabled = true;
+  setTimeout(showRevealView, 900);
+}
+
+async function saveMemoryImage() {
+  const btn = $('#save-memory');
+  if (typeof html2canvas !== 'function') {
+    say('Could not load image capture. Check your connection and refresh.');
+    return;
   }
-  setTimeout(() => (confetti.innerHTML = ''), 3200);
-}
-
-function celebrate() {
-  stage.classList.remove('glow'); void stage.offsetWidth;                        // restart animation
-  stage.classList.add('glow');
-  burstConfetti();
-}
-
-function openModal() {
-  modal.hidden = false; void modal.offsetWidth;
-  modal.classList.add('open');
-  $('#close').focus();
-}
-function closeModal() {
-  modal.classList.remove('open');
-  setTimeout(() => (modal.hidden = true), 700);
-  stage.classList.remove('glow');
+  btn.disabled = true;
+  const prev = btn.textContent;
+  btn.textContent = 'Saving…';
+  try {
+    const canvas = await html2canvas(memoryCapture, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#FFF8F3',
+      logging: false
+    });
+    const link = document.createElement('a');
+    link.download = 'our-memory.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = prev;
+  }
 }
 
 $('#finish').addEventListener('click', () => {
   if (!count()) { say('Add a bloom or two first!'); return; }
-  celebrate();
-  setTimeout(openModal, 2200);                                                    // poem slides in after the animation
+  startGiftSequence();
 });
-$('#again').addEventListener('click', celebrate);
-$('#close').addEventListener('click', closeModal);
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+openGiftBtn.addEventListener('click', openGift);
+$('#save-memory').addEventListener('click', saveMemoryImage);

@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="app">
+  <main class="app" id="app">
     <header class="top">
       <h1>Bouquet Builder</h1>
       <p>Drag blooms into the wrapper and arrange them your way.</p>
@@ -44,7 +44,7 @@
         </svg>
       </div>
 
-      <div class="actions">
+      <div class="actions" id="canvas-actions">
         <button id="finish" class="btn-main" type="button">Finish bouquet</button>
         <button id="clear" class="btn-soft" type="button">Start over</button>
       </div>
@@ -52,33 +52,62 @@
     </section>
 
     <!-- INVENTORY (tiles are built from the ITEMS list in script.js) -->
-    <aside class="shelf">
+    <aside class="shelf" id="shelf">
       <h2>Pick your blooms</h2>
       <div class="grid" id="inventory"></div>
     </aside>
   </main>
 
-  <!-- Confetti lands here -->
-  <div class="confetti" id="confetti" aria-hidden="true"></div>
-
-  <!-- THE REVEAL: edit the poem text here -->
-  <div class="modal" id="modal" hidden>
-    <div class="card" role="dialog" aria-modal="true" aria-labelledby="poem-title">
-      <h2 id="poem-title">To my baby,</h2>
-      <p class="poem">
-        Like a lotus that blooms in the softest of light,<br />
-        You make all of my days and my evenings so bright.<br />
-        Through all of our moments, the moon and the stars,<br />
-        I'm so lucky to know that your heart is now ours.
-      </p>
-      <p class="sign">Happy Monthsary!</p>
-      <div class="actions">
-        <button id="again" class="btn-soft" type="button">Replay confetti</button>
-        <button id="close" class="btn-main" type="button">Back to bouquet</button>
+  <!-- Gift box sequence (after Finish bouquet) -->
+  <div class="gift-scene" id="gift-scene" hidden>
+    <div class="gift-scene-inner">
+      <div class="gift-box" id="gift-box" aria-hidden="true">
+        <div class="gift-lid">
+          <div class="gift-lid-top"></div>
+          <div class="gift-lid-front"></div>
+          <div class="gift-bow">
+            <span class="bow-loop bow-left"></span>
+            <span class="bow-knot"></span>
+            <span class="bow-loop bow-right"></span>
+            <span class="bow-tail bow-tail-left"></span>
+            <span class="bow-tail bow-tail-right"></span>
+          </div>
+        </div>
+        <div class="gift-body">
+          <div class="gift-body-front"></div>
+          <div class="gift-ribbon-v"></div>
+          <div class="gift-ribbon-h"></div>
+        </div>
+        <div class="gift-shadow"></div>
       </div>
+      <button id="open-gift" class="btn-main gift-open-btn" type="button" hidden>Open Gift</button>
     </div>
   </div>
 
+  <!-- Reveal: letter + bouquet (edit the poem text here) -->
+  <div class="reveal-view" id="reveal-view" hidden>
+    <div class="memory-capture" id="memory-capture">
+      <article class="paper-letter" aria-labelledby="poem-title">
+        <h2 id="poem-title">To my baby,</h2>
+        <p class="poem">
+          Like a lotus that blooms in the softest of light,<br />
+          You make all of my days and my evenings so bright.<br />
+          Through all of our moments, the moon and the stars,<br />
+          I'm so lucky to know that your heart is now ours.
+        </p>
+        <p class="sign">Happy Monthsary!</p>
+      </article>
+      <div class="reveal-bouquet-col">
+        <p class="reveal-label">Your bouquet</p>
+        <div class="reveal-bouquet-host" id="reveal-bouquet"></div>
+      </div>
+    </div>
+    <div class="reveal-actions">
+      <button id="save-memory" class="btn-main" type="button">Save our Memory</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="script.js"></script>
 </body>
 </html>
